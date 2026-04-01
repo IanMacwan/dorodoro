@@ -33,13 +33,17 @@ setInterval(async () => {
 
     const result = check(time, session.warned);
 
+    setBadge("ON", "#b8bb26");
+
     if (!result) continue;
 
     if (result.type === "WARNING") {
+      setBadge("!", "#fabd2f");
       api.tabs.sendMessage(tab.id, result);
     }
 
     if (result.type === "FINAL") {
+      setBadge("X", "#fb4934");
       api.tabs.sendMessage(tab.id, result);
 
       setTimeout(() => {
@@ -48,3 +52,10 @@ setInterval(async () => {
     }
   }
 }, 1000);
+
+function setBadge(text, color) {
+  if (!api.action) return;
+
+  api.action.setBadgeText({ text });
+  api.action.setBadgeBackgroundColor({ color });
+}
