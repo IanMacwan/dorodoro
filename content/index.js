@@ -1,8 +1,8 @@
-import { api } from "../shared/api.js";
+const custom_api = typeof browser !== "undefined" ? browser : chrome;
 
-api.runtime.onMessage.addListener((msg) => {
+custom_api.runtime.onMessage.addListener((msg) => {
   if (msg.type === "WARNING") {
-    show(`You've been watching for ${msg.minutes} minutes.`);
+    show(`You've been watching for ${msg.seconds} seconds.`);
   }
 
   if (msg.type === "FINAL") {

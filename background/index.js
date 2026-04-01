@@ -1,4 +1,4 @@
-import { api } from "../shared/api.js"
+import { api } from "../shared/api.js";
 import { activate, deactivate, getTimeForTab, getSession } from "../application/sessionManager.js";
 import { check } from "../application/rulesEngine.js";
 
@@ -6,9 +6,12 @@ const TARGET = "youtube.com";
 
 api.tabs.onActivated.addListener(({ tabId }) => {
   activate(tabId);
+
   api.tabs.query({}, tabs => {
     tabs.forEach(t => {
-      if (t.id !== tabId) deactivate(t.id);
+      if (t.id !== tabId) {
+        deactivate(t.id);
+      }
     });
   });
 });
@@ -33,15 +36,15 @@ setInterval(async () => {
     if (!result) continue;
 
     if (result.type === "WARNING") {
-      session.warned.add(result.minutes);
-
       api.tabs.sendMessage(tab.id, result);
     }
 
     if (result.type === "FINAL") {
       api.tabs.sendMessage(tab.id, result);
 
-      setTimeout(() => api.tabs.remove(tab.id), 5000);
+      setTimeout(() => {
+        api.tabs.remove(tab.id);
+      }, 5000);
     }
   }
-}, 10000);
+}, 1000);
