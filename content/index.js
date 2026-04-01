@@ -1,19 +1,19 @@
 const custom_api = typeof browser !== "undefined" ? browser : chrome;
 
 let indicator = null;
+let seconds = 0;
+let timerInterval = null;
+
+if (window.location.href.includes("youtube.com")) {
+  ensureIndicator();
+  startTimer();
+}
 
 custom_api.runtime.onMessage.addListener((msg) => {
   ensureIndicator();
 
-  if (msg.type === "WARNING") {
-    showToast(`Watching: ${msg.seconds}s`);
-    setIndicatorState("warning");
-  }
-
-  if (msg.type === "FINAL") {
-    showToast("Time limit reached. Closing tab...");
-    setIndicatorState("final");
-  }
+  if (msg.type === "WARNING") setIndicatorState("warning");
+  if (msg.type === "FINAL") setIndicatorState("final");
 });
 
 function ensureIndicator() {
@@ -21,9 +21,64 @@ function ensureIndicator() {
 
   indicator = document.createElement("div");
   indicator.className = "yt-timer-indicator normal";
-  indicator.innerText = "ACTIVE";
+
+  const ascii = document.createElement("pre");
+  ascii.className = "yt-ascii";
+  ascii.textContent = String.raw`
+ ▌       ▌      
+▛▌▛▌▛▘▛▌▛▌▛▌▛▘▛▌
+▙▌▙▌▌ ▙▌▙▌▙▌▌ ▙▌
+                
+`;
+
+  const status = document.createElement("div");
+  status.className = "yt-status";
+  status.textContent = "ACTIVE";
+
+  const timer = document.createElement("div");
+  timer.className = "yt-timer";
+  timer.textContent = "0:00:00";
+
+  const progress = document.createElement("div");
+  progress.className = "yt-progress";
+
+  const bar = document.createElement("div");
+  bar.className = "yt-progress-bar";
+
+  progress.appendChild(bar);
+
+  indicator.appendChild(ascii);
+  indicator.appendChild(status);
+  indicator.appendChild(timer);
+  indicator.appendChild(progress);
 
   document.body.appendChild(indicator);
+}
+
+function startTimer() {
+  if (timerInterval) return;
+
+  timerInterval = setInterval(() => {
+    seconds++;
+    updateTimerUI(seconds);
+  }, 1000);
+}
+
+function updateTimerUI(sec) {
+  const timerEl = document.querySelector(".yt-timer");
+  const bar = document.querySelector(".yt-progress-bar");
+
+  if (timerEl) {
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    timerEl.innerText = `${h}:${m.toString().padStart(2, "0")}:${s
+      .toString()
+      .padStart(2, "0")}`;
+  }
+
+  const percent = Math.min((sec * 1000) / 3600000 * 100, 100);
+  if (bar) bar.style.width = percent + "%";
 }
 
 function setIndicatorState(state) {
@@ -32,16 +87,9 @@ function setIndicatorState(state) {
   indicator.classList.remove("normal", "warning", "final");
   indicator.classList.add(state);
 
-  if (state === "warning") indicator.innerText = "⚠ WATCHING";
-  if (state === "final") indicator.innerText = "⛔ LIMIT";
-}
+  const status = indicator.querySelector(".yt-status");
 
-function showToast(text) {
-  const div = document.createElement("div");
-  div.className = "yt-timer-toast";
-  div.innerText = text;
-
-  document.body.appendChild(div);
-
-  setTimeout(() => div.remove(), 4000);
+  if (state === "normal") status.innerText = "ACTIVE";
+  if (state === "warning") status.innerText = "⚠ WATCHING";
+  if (state === "final") status.innerText = "⛔ LIMIT";
 }

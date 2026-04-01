@@ -8,7 +8,6 @@ export function check(time, warned) {
     return { type: "FINAL", seconds };
   }
 
-  // prevent skipped warnings due to timer drift
   for (const w of WARNINGS) {
     if (seconds >= w && !warned.has(w)) {
       warned.add(w);

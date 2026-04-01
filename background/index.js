@@ -4,14 +4,14 @@ import { check } from "../application/rulesEngine.js";
 
 const TARGET = "youtube.com";
 
+const warnedMap = new Map();
+
 api.tabs.onActivated.addListener(({ tabId }) => {
   activate(tabId);
 
-  api.tabs.query({}, tabs => {
-    tabs.forEach(t => {
-      if (t.id !== tabId) {
-        deactivate(t.id);
-      }
+  api.tabs.query({}, (tabs) => {
+    tabs.forEach((t) => {
+      if (t.id !== tabId) deactivate(t.id);
     });
   });
 });
@@ -31,31 +31,30 @@ setInterval(async () => {
     const session = getSession(tab.id);
     const time = getTimeForTab(tab.id);
 
-    const result = check(time, session.warned);
+    if (!warnedMap.has(tab.id)) warnedMap.set(tab.id, new Set());
+
+    const result = check(time, warnedMap.get(tab.id));
 
     setBadge("ON", "#b8bb26");
 
     if (!result) continue;
 
     if (result.type === "WARNING") {
-      setBadge("!", "#fabd2f");
       api.tabs.sendMessage(tab.id, result);
+      setBadge("!", "#fabd2f");
     }
 
     if (result.type === "FINAL") {
-      setBadge("X", "#fb4934");
       api.tabs.sendMessage(tab.id, result);
+      setBadge("X", "#fb4934");
 
-      setTimeout(() => {
-        api.tabs.remove(tab.id);
-      }, 5000);
+      setTimeout(() => api.tabs.remove(tab.id), 5000);
     }
   }
 }, 1000);
 
 function setBadge(text, color) {
-  if (!api.action) return;
-
+  if (!api.action) return; // safety for older browsers
   api.action.setBadgeText({ text });
   api.action.setBadgeBackgroundColor({ color });
 }
