@@ -1,5 +1,5 @@
-const LIMIT = 60 * 60 * 1000; // 1 hour (in ms)
-const WARNINGS = [15 * 60, 30 * 60, 45 * 60]; // seconds (15, 30, 45 mins)
+const LIMIT = 60 * 60 * 1000; // 60 minutes
+const WARNINGS = [45 * 60, 50 * 60, 55 * 60]; // seconds
 
 export function check(time, warned) {
   const seconds = Math.floor(time / 1000);

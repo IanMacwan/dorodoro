@@ -1,19 +1,25 @@
 const custom_api = typeof browser !== "undefined" ? browser : chrome;
 
 let indicator = null;
-let seconds = 0;
-let timerInterval = null;
 
 if (window.location.href.includes("youtube.com")) {
   ensureIndicator();
-  startTimer();
 }
 
 custom_api.runtime.onMessage.addListener((msg) => {
   ensureIndicator();
 
-  if (msg.type === "WARNING") setIndicatorState("warning");
-  if (msg.type === "FINAL") setIndicatorState("final");
+  if (msg.type === "TICK") {
+    updateTimerUI(Math.floor(msg.time / 1000));
+  }
+
+  if (msg.type === "WARNING") {
+    setIndicatorState("warning");
+  }
+
+  if (msg.type === "FINAL") {
+    setIndicatorState("final");
+  }
 });
 
 function ensureIndicator() {
@@ -55,15 +61,6 @@ function ensureIndicator() {
   document.body.appendChild(indicator);
 }
 
-function startTimer() {
-  if (timerInterval) return;
-
-  timerInterval = setInterval(() => {
-    seconds++;
-    updateTimerUI(seconds);
-  }, 1000);
-}
-
 function updateTimerUI(sec) {
   const timerEl = document.querySelector(".yt-timer");
   const bar = document.querySelector(".yt-progress-bar");
@@ -72,12 +69,14 @@ function updateTimerUI(sec) {
     const h = Math.floor(sec / 3600);
     const m = Math.floor((sec % 3600) / 60);
     const s = sec % 60;
-    timerEl.innerText = `${h}:${m.toString().padStart(2, "0")}:${s
-      .toString()
-      .padStart(2, "0")}`;
+
+    timerEl.innerText =
+      `${h}:${m.toString().padStart(2, "0")}:${s
+        .toString()
+        .padStart(2, "0")}`;
   }
 
-  const percent = Math.min((sec * 1000) / 3600000 * 100, 100);
+  const percent = Math.min((sec / 3600) * 100, 100);
   if (bar) bar.style.width = percent + "%";
 }
 

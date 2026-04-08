@@ -1,60 +1,83 @@
 import { api } from "../shared/api.js";
-import { activate, deactivate, getTimeForTab, getSession } from "../application/sessionManager.js";
+import { activateTab, deactivateTab, getGlobalTime } from "../application/globalSession.js";
 import { check } from "../application/rulesEngine.js";
 
 const TARGET = "youtube.com";
+const warnedSet = new Set();
 
-const warnedMap = new Map();
+api.tabs.onActivated.addListener(async ({ tabId }) => {
+  const tab = await api.tabs.get(tabId);
 
-api.tabs.onActivated.addListener(({ tabId }) => {
-  activate(tabId);
+  if (tab.url?.includes(TARGET)) {
+    activateTab(tabId);
+  }
 
-  api.tabs.query({}, (tabs) => {
-    tabs.forEach((t) => {
-      if (t.id !== tabId) deactivate(t.id);
-    });
-  });
-});
-
-api.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (tab.url && tab.url.includes(TARGET)) {
-    getSession(tabId);
+  const tabs = await api.tabs.query({});
+  for (const t of tabs) {
+    if (t.id !== tabId) {
+      deactivateTab(t.id);
+    }
   }
 });
 
+api.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (!tab.url) return;
+
+  if (tab.url.includes(TARGET)) {
+    activateTab(tabId);
+  } else {
+    deactivateTab(tabId);
+  }
+});
+
+api.tabs.onRemoved.addListener((tabId) => {
+  deactivateTab(tabId);
+});
+
 setInterval(async () => {
-  const tabs = await api.tabs.query({});
+  const time = getGlobalTime();
+  const result = check(time, warnedSet);
 
-  for (const tab of tabs) {
-    if (!tab.url || !tab.url.includes(TARGET)) continue;
+  const tabs = await api.tabs.query({
+    url: "*://*.youtube.com/*"
+  });
 
-    const session = getSession(tab.id);
-    const time = getTimeForTab(tab.id);
+  tabs.forEach(tab => {
+    try {
+      api.tabs.sendMessage(tab.id, {
+        type: "TICK",
+        time
+      });
+    } catch (e) {}
+  });
 
-    if (!warnedMap.has(tab.id)) warnedMap.set(tab.id, new Set());
+  setBadge("ON", "#b8bb26");
 
-    const result = check(time, warnedMap.get(tab.id));
+  if (!result) return;
 
-    setBadge("ON", "#b8bb26");
+  if (result.type === "WARNING") {
+    tabs.forEach(tab => {
+      try {
+        api.tabs.sendMessage(tab.id, result);
+      } catch (e) {}
+    });
+    setBadge("!", "#fabd2f");
+  }
 
-    if (!result) continue;
-
-    if (result.type === "WARNING") {
-      api.tabs.sendMessage(tab.id, result);
-      setBadge("!", "#fabd2f");
-    }
-
-    if (result.type === "FINAL") {
-      api.tabs.sendMessage(tab.id, result);
-      setBadge("X", "#fb4934");
-
+  if (result.type === "FINAL") {
+    tabs.forEach(tab => {
+      try {
+        api.tabs.sendMessage(tab.id, result);
+      } catch (e) {}
       setTimeout(() => api.tabs.remove(tab.id), 5000);
-    }
+    });
+
+    setBadge("X", "#fb4934");
   }
 }, 1000);
 
 function setBadge(text, color) {
-  if (!api.action) return; // safety for older browsers
+  if (!api.action) return;
   api.action.setBadgeText({ text });
   api.action.setBadgeBackgroundColor({ color });
 }

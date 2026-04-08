@@ -17,5 +17,6 @@ export function stop(tracker) {
 }
 
 export function getTime(tracker) {
-  return tracker.total + (tracker.start ? Date.now() - tracker.start : 0);
+  return tracker.total +
+    (tracker.start ? Date.now() - tracker.start : 0);
 }
