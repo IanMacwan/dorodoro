@@ -1,10 +1,9 @@
 # 🧠 dorodoro
 
-> A minimal, clean-architecture browser extension for enforcing attention boundaries on YouTube/Youtube Shorts.
+> A minimal, clean-architecture browser extension for enforcing attention boundaries on youtube/youtube shorts.
 
-dorodoro tracks **active tab time only**, delivers staged warnings, and automatically closes YouTube when limits are exceeded.
+dorodoro tracks **active youtube time globally across your entire browser session** and automatically closes youtube when limits are exceeded.
 
-Built with simplicity, modularity, and long-term maintainability in mind.
+What makes dorodoro different is that it's built to stay simple, lightweight, modular, and most importantly, respectful of your privacy.
 
-> [!NOTE]
-> **Disclaimer:** This project is a work in progress and still contains some bugs!
+*⚠️ note: this project is still a work in progress and may have a few bugs.*
