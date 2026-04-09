@@ -42,9 +42,9 @@ setInterval(async () => {
     url: "*://*.youtube.com/*"
   });
 
-  tabs.forEach(tab => {
+  tabs.forEach(async tab => {
     try {
-      api.tabs.sendMessage(tab.id, {
+      await api.tabs.sendMessage(tab.id, {
         type: "TICK",
         time
       });
@@ -56,18 +56,18 @@ setInterval(async () => {
   if (!result) return;
 
   if (result.type === "WARNING") {
-    tabs.forEach(tab => {
+    tabs.forEach(async tab => {
       try {
-        api.tabs.sendMessage(tab.id, result);
+        await api.tabs.sendMessage(tab.id, result);
       } catch (e) {}
     });
     setBadge("!", "#fabd2f");
   }
 
   if (result.type === "FINAL") {
-    tabs.forEach(tab => {
+    tabs.forEach(async tab => {
       try {
-        api.tabs.sendMessage(tab.id, result);
+        await api.tabs.sendMessage(tab.id, result);
       } catch (e) {}
       setTimeout(() => api.tabs.remove(tab.id), 5000);
     });
