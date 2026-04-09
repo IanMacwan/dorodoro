@@ -8,6 +8,7 @@
   "host_permissions": ["*://*.youtube.com/*"],
 
   "background": {
+    "scripts": ["background/index.js"],
     "service_worker": "background/index.js",
     "type": "module"
   },
