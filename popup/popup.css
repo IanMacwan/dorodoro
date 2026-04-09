@@ -1,0 +1,127 @@
+:root {
+  --bg: #282828;
+  --bg-soft: #3c3836;
+  --fg: #ebdbb2;
+  --muted: rgba(235, 219, 178, 0.7);
+  --green: #b8bb26;
+  --red: #fb4934;
+  --yellow: #fabd2f;
+  --outline: rgba(235, 219, 178, 0.18);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+body {
+  width: 300px;
+}
+
+.card {
+  padding: 14px;
+}
+
+.header {
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.section {
+  padding: 12px;
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+  background: var(--bg-soft);
+}
+
+.label {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  border: 1px solid var(--outline);
+  border-radius: 10px;
+  padding: 10px 10px;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 14px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: rgba(250, 189, 47, 0.55);
+}
+
+.button {
+  border: 1px solid rgba(184, 187, 38, 0.45);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: rgba(184, 187, 38, 0.18);
+  color: var(--fg);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.button:hover {
+  background: rgba(184, 187, 38, 0.26);
+}
+
+.help {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.presets {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.chip {
+  border: 1px solid var(--outline);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: rgba(235, 219, 178, 0.35);
+}
+
+.status {
+  margin-top: 10px;
+  min-height: 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.status.ok { color: var(--green); }
+.status.err { color: var(--red); }

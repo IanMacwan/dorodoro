@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>dorodoro</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <main class="card">
+      <header class="header">
+        <div class="title">dorodoro</div>
+        <div class="subtitle">Set your session limit</div>
+      </header>
+
+      <section class="section">
+        <label class="label" for="limit">Time limit (minutes)</label>
+        <div class="row">
+          <input id="limit" class="input" type="number" inputmode="numeric" min="1" max="300" step="1" />
+          <button id="save" class="button" type="button">Save</button>
+        </div>
+        <div class="help">Allowed range: 1 to 300 minutes.</div>
+
+        <div class="presets" aria-label="Presets">
+          <button class="chip" type="button" data-minutes="15">15</button>
+          <button class="chip" type="button" data-minutes="30">30</button>
+          <button class="chip" type="button" data-minutes="60">60</button>
+        </div>
+
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <script type="module" src="./index.js"></script>
+  </body>
+</html>

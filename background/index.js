@@ -1,9 +1,31 @@
 import { api } from "../shared/api.js";
 import { activateTab, deactivateTab, getGlobalTime } from "../application/globalSession.js";
 import { check } from "../application/rulesEngine.js";
+import {
+  DEFAULT_TIME_LIMIT_MINUTES,
+  KEY_TIME_LIMIT_MINUTES,
+  getTimeLimitMinutes,
+  sanitizeTimeLimitMinutes
+} from "../shared/settings.js";
 
 const TARGET = "youtube.com";
 const warnedSet = new Set();
+
+let timeLimitMinutes = DEFAULT_TIME_LIMIT_MINUTES;
+
+// Service worker can be restarted at any time; reload persisted config.
+getTimeLimitMinutes().then((m) => {
+  timeLimitMinutes = m;
+});
+
+api.storage?.onChanged?.addListener((changes, area) => {
+  if (area !== "local") return;
+  const change = changes?.[KEY_TIME_LIMIT_MINUTES];
+  if (!change) return;
+
+  timeLimitMinutes = sanitizeTimeLimitMinutes(change.newValue);
+  warnedSet.clear();
+});
 
 api.tabs.onActivated.addListener(async ({ tabId }) => {
   const tab = await api.tabs.get(tabId);
@@ -36,7 +58,7 @@ api.tabs.onRemoved.addListener((tabId) => {
 
 setInterval(async () => {
   const time = getGlobalTime();
-  const result = check(time, warnedSet);
+  const result = check(time, warnedSet, timeLimitMinutes);
 
   const tabs = await api.tabs.query({
     url: "*://*.youtube.com/*"
@@ -46,7 +68,8 @@ setInterval(async () => {
     try {
       await api.tabs.sendMessage(tab.id, {
         type: "TICK",
-        time
+        time,
+        limitMs: timeLimitMinutes * 60 * 1000
       });
     } catch (e) {}
   });

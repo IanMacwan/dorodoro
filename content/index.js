@@ -1,6 +1,7 @@
 const custom_api = typeof browser !== "undefined" ? browser : chrome;
 
 let indicator = null;
+let limitMs = 60 * 60 * 1000;
 
 if (window.location.href.includes("youtube.com")) {
   ensureIndicator();
@@ -10,6 +11,13 @@ custom_api.runtime.onMessage.addListener((msg) => {
   ensureIndicator();
 
   if (msg.type === "TICK") {
+    if (
+      typeof msg.limitMs === "number" &&
+      Number.isFinite(msg.limitMs) &&
+      msg.limitMs > 0
+    ) {
+      limitMs = msg.limitMs;
+    }
     updateTimerUI(Math.floor(msg.time / 1000));
   }
 
@@ -76,7 +84,8 @@ function updateTimerUI(sec) {
         .padStart(2, "0")}`;
   }
 
-  const percent = Math.min((sec / 3600) * 100, 100);
+  const limitSec = Math.max(1, Math.floor(limitMs / 1000));
+  const percent = Math.min((sec / limitSec) * 100, 100);
   if (bar) bar.style.width = percent + "%";
 }
 

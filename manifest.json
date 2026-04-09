@@ -22,6 +22,7 @@
   ],
 
   "action": {
-    "default_title": "dorodoro"
+    "default_title": "dorodoro",
+    "default_popup": "popup/index.html"
   }
 }
