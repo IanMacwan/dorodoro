@@ -1,18 +1,14 @@
 {
   "manifest_version": 3,
   "name": "dorodoro",
-  "version": "0.2.0",
-  "description": "Attention boundary extension",
-
+  "version": "1.1.0",
+  "description": "Tracks time spent on YouTube and warns when a configurable limit is reached.",
   "permissions": ["tabs", "storage"],
   "host_permissions": ["*://*.youtube.com/*"],
-
   "background": {
-    "scripts": ["background/index.js"],
     "service_worker": "background/index.js",
     "type": "module"
   },
-
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
@@ -20,8 +16,20 @@
       "css": ["styles/overlay.css"]
     }
   ],
-
   "action": {
-    "default_title": "dorodoro"
+    "default_popup": "popup/popup.html",
+    "default_title": "Dorodoro settings",
+    "default_icon": {
+      "16": "assets/icon16.png",
+      "32": "assets/icon32.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icon16.png",
+    "32": "assets/icon32.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
   }
 }
